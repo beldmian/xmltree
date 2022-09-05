@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct Attribute {
 	char* name;
@@ -29,6 +30,12 @@ struct XMLNode* createNode(char* tag, char* data) {
 	return node;
 }
 
+char* concat_str(char* dest, char* addition) {
+    char* buf = realloc(dest, strlen(dest) + strlen(addition) + 1);
+    strcat(buf, addition);
+    return buf;
+}
+
 void addChildnode(struct XMLNode* parent, struct XMLNode* child) {
 	parent->child_count++;
 	parent->children = realloc(parent->children,
@@ -36,20 +43,30 @@ void addChildnode(struct XMLNode* parent, struct XMLNode* child) {
 	parent->children[parent->child_count-1] = child;
 };
 
-void generateXML(struct XMLNode* node, int nesting_level) {
-	printf("<%s", node->tag);
+char* generateXML(struct XMLNode* node, int nesting_level) {
+    char* out = malloc(2);
+    strcpy(out, "<");
+
+    out = concat_str(out, node->tag);
 	for (int i = 0; i < node->attrs_count; i++) {
 		struct Attribute* attr = node->attrs[i];
-		printf("1");
-		printf(" %s=\"%s\"", attr->name, attr->value);
+        out = concat_str(out, " ");
+        out = concat_str(out, attr->name);
+        out = concat_str(out, "=\"");
+        out = concat_str(out, attr->value);
+        out = concat_str(out, "\"");
 	}
-	printf(">");
+    out = concat_str(out, ">");
 	if (node->data)
-		printf("%s", node->data);
+		out = concat_str(out, node->data);
 	for (int i = 0; i < node->child_count; i++) {
-		generateXML(node->children[i], nesting_level+1);
+		char* child = generateXML(node->children[i], nesting_level+1);
+        out = concat_str(out, child);
 	}
-	printf("</%s>", node->tag);
+    out = concat_str(out, "</");
+    out = concat_str(out, node->tag);
+    out = concat_str(out, ">");
+    return out;
 };
 
 void freeTree(struct XMLNode* root) {

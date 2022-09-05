@@ -17,7 +17,7 @@ struct XMLNode {
 
 void addChildnode(struct XMLNode*, struct XMLNode*);
 struct XMLNode* createNode(char*, char*);
-void generateXML(struct XMLNode*, int);
+char* generateXML(struct XMLNode*, int);
 void freeTree(struct XMLNode*);
 void addAttribute(struct XMLNode*, struct Attribute*);
 
